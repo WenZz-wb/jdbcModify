@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.hz.testMethod.dao.StudentMapper">
+    <resultMap id="BaseResultMap" type="com.hz.testMethod.bean.Student">
+        <id column="sno" property="sno" jdbcType="VARCHAR"/>
+        <result column="sname" property="sname" jdbcType="VARCHAR"/>
+        <result column="ssex" property="ssex" jdbcType="VARCHAR"/>
+        <result column="sbirthday" property="sbirthday" jdbcType="DATE"/>
+        <result column="sclass" property="sclass" jdbcType="VARCHAR"/>
+    </resultMap>
+    <cache/>
+
+    <!-- foreach
+                collection:指定输入对象中的集合属性
+                item:每次遍历生成的对象
+                open:开始遍历时的拼接字符串
+                close:结束时拼接的字符串
+                separator:遍历对象之间需要拼接的字符串
+    -->
+    <sql id="Example_Where_Clause">
+        <where>
+            <foreach collection="oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+
+    <sql id="Update_By_Example_Where_Clause">
+        <where>
+            <foreach collection="example.oredCriteria" item="criteria" separator="or">
+                <if test="criteria.valid">
+                    <trim prefix="(" suffix=")" prefixOverrides="and">
+                        <foreach collection="criteria.criteria" item="criterion">
+                            <choose>
+                                <when test="criterion.noValue">
+                                    and ${criterion.condition}
+                                </when>
+                                <when test="criterion.singleValue">
+                                    and ${criterion.condition} #{criterion.value}
+                                </when>
+                                <when test="criterion.betweenValue">
+                                    and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                                </when>
+                                <when test="criterion.listValue">
+                                    and ${criterion.condition}
+                                    <foreach collection="criterion.value" item="listItem" open="(" close=")"
+                                             separator=",">
+                                        #{listItem}
+                                    </foreach>
+                                </when>
+                            </choose>
+                        </foreach>
+                    </trim>
+                </if>
+            </foreach>
+        </where>
+    </sql>
+
+    <sql id="Base_Column_List">
+    sno, sname, ssex, sbirthday,sclass
+  </sql>
+
+    <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.hz.testMethod.bean.StudentExample">
+        select
+        <if test="distinct">
+            distinct
+        </if>
+        'false' as QUERYID,
+        <include refid="Base_Column_List"/>
+        from student
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+        <if test="orderByClause != null">
+            order by ${orderByClause}
+        </if>
+    </select>
+
+    <select id="selectByPrimaryKey" resultType="com.hz.testMethod.bean.Student" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from student
+        where sno = #{sno,jdbcType=VARCHAR}
+    </select>
+    <select id="selectByOne" resultType="com.hz.testMethod.bean.Student" parameterType="java.lang.String">
+        select   * from student  where
+           sno = #{sno,jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectStuden" resultType="com.hz.testMethod.bean.Student">
+   select * from student;
+ </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.String">
+    delete from student
+    where sno = #{sno,jdbcType=VARCHAR}
+  </delete>
+
+    <delete id="deleteByExample" parameterType="com.hz.testMethod.bean.StudentExample">
+        delete from student
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </delete>
+
+    <insert id="insert" parameterType="com.hz.testMethod.bean.Student">
+    insert into student (sno, sname, ssex, 
+      sbirthday, sclass)
+    values (#{sno,jdbcType=VARCHAR}, #{sname,jdbcType=VARCHAR}, #{ssex,jdbcType=VARCHAR}, 
+      #{sbirthday,jdbcType=DATE}, #{sclass,jdbcType=VARCHAR})
+  </insert>
+
+
+    <!--IF条件成立，进入语句    test 条件-->
+    <!--prefix 开头       suffix   结尾      Overrides删除（可搭配开头结尾一起使用） -->
+    <insert id="insertSelective" parameterType="com.hz.testMethod.bean.Student">
+        insert into student
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="sno != null">
+                sno,
+            </if>
+            <if test="sname != null">
+                sname,
+            </if>
+            <if test="ssex != null">
+                ssex,
+            </if>
+            <if test="sbirthday != null">
+                sbirthday,
+            </if>
+            <if test="sclass != null">
+                sclass,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="sno != null">
+                #{sno,jdbcType=VARCHAR},
+            </if>
+            <if test="sname != null">
+                #{sname,jdbcType=VARCHAR},
+            </if>
+            <if test="ssex != null">
+                #{ssex,jdbcType=VARCHAR},
+            </if>
+            <if test="sbirthday != null">
+                #{sbirthday,jdbcType=DATE},
+            </if>
+            <if test="sclass != null">
+                #{sclass,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+
+
+    <select id="countByExample" parameterType="com.hz.testMethod.bean.StudentExample" resultType="java.lang.Integer">
+        select count(*) from student
+        <if test="_parameter != null">
+            <include refid="Example_Where_Clause"/>
+        </if>
+    </select>
+
+    <!--set 语句，用于修改 Set开头，条件语句放入Set中  -->
+    <!--include  refid 引入其他的SQL语句 如果不在本文件中需要加namespace-->
+    <!--_parameter  如果只有一个参数，则_parameter代表这个参数-->
+    <!--_parameter 如果有多个参数，则_parameter代表一个集合-->
+    <update id="updateByExampleSelective" parameterType="map">
+        update student
+        <set>
+            <if test="record.sno != null">
+                sno = #{record.sno,jdbcType=VARCHAR},
+            </if>
+            <if test="record.sname != null">
+                sname = #{record.sname,jdbcType=VARCHAR},
+            </if>
+            <if test="record.ssex != null">
+                ssex = #{record.ssex,jdbcType=VARCHAR},
+            </if>
+            <if test="record.sbirthday != null">
+                sbirthday = #{record.sbirthday,jdbcType=DATE},
+            </if>
+            <if test="record.sclass != null">
+                sclass = #{record.sclass,jdbcType=VARCHAR},
+            </if>
+        </set>
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+
+
+    <update id="updateByExample" parameterType="map">
+        update student
+        set sno = #{record.sno,jdbcType=VARCHAR},
+        sname = #{record.sname,jdbcType=VARCHAR},
+        ssex = #{record.ssex,jdbcType=VARCHAR},
+        sbirthday = #{record.sbirthday,jdbcType=DATE},
+        sclass = #{record.sclass,jdbcType=VARCHAR}
+        <if test="_parameter != null">
+            <include refid="Update_By_Example_Where_Clause"/>
+        </if>
+    </update>
+
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.hz.testMethod.bean.Student">
+        update student
+        <set>
+            <if test="sname != null">
+                sname = #{sname,jdbcType=VARCHAR},
+            </if>
+            <if test="ssex != null">
+                ssex = #{ssex,jdbcType=VARCHAR},
+            </if>
+            <if test="sbirthday != null">
+                sbirthday = #{sbirthday,jdbcType=DATE},
+            </if>
+            <if test="sclass != null">
+                sclass = #{sclass,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where sno = #{sno,jdbcType=VARCHAR}
+    </update>
+
+
+    <update id="updateByPrimaryKey" parameterType="com.hz.testMethod.bean.Student">
+    update student
+    set sname = #{sname,jdbcType=VARCHAR},
+      ssex = #{ssex,jdbcType=VARCHAR},
+      sbirthday = #{sbirthday,jdbcType=DATE},
+      sclass = #{sclass,jdbcType=VARCHAR}
+    where sno = #{sno,jdbcType=VARCHAR}
+  </update>
+</mapper>
